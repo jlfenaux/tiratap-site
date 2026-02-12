@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiratap — Complex Data Management Tools</title>
+  <meta name="description" content="Tiratap builds custom complex data management tools for the web.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%230a0a0a'/><text x='50' y='68' text-anchor='middle' font-family='serif' font-size='56' font-weight='bold' fill='%23c4956a'>T</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@300;400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+    :root {
+      --bg: #080808;
+      --bg-elevated: #0f0f0f;
+      --text: #e8e4df;
+      --text-dim: #7a7672;
+      --accent: #c4956a;
+      --accent-dim: rgba(196,149,106,.12);
+      --rule: rgba(255,255,255,.06);
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── Grid background ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+      mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 20%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 20%, transparent 100%);
+    }
+
+    /* ─── Ambient glow ─── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -40vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120vw;
+      height: 80vh;
+      background: radial-gradient(ellipse at center, rgba(196,149,106,.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page { position: relative; z-index: 1; }
+
+    /* ─── Layout ─── */
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      padding: 2rem 0;
+      opacity: 0;
+      animation: fadeIn .8s ease .2s forwards;
+    }
+
+    nav .wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--text);
+      letter-spacing: .02em;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    nav a.contact-link {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 300;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: .5rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      transition: color .3s, border-color .3s;
+    }
+
+    nav a.contact-link:hover {
+      color: var(--accent);
+      border-color: rgba(196,149,106,.3);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 12vh 0 10vh;
+      opacity: 0;
+      animation: slideUp .9s ease .4s forwards;
+    }
+
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      font-weight: 300;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 540px;
+      line-height: 1.8;
+    }
+
+    .hero p a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+      transition: border-color .3s;
+    }
+
+    .hero p a:hover {
+      border-color: var(--accent);
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      border: none;
+      height: 1px;
+      background: var(--rule);
+      margin: 0;
+      opacity: 0;
+      animation: fadeIn .6s ease .8s forwards;
+    }
+
+    /* ─── Services ─── */
+    .services {
+      padding: 8vh 0;
+      opacity: 0;
+      animation: slideUp .9s ease .7s forwards;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      font-weight: 400;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 3rem;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .service-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .service-num {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      font-weight: 300;
+      color: var(--accent);
+      padding-top: .35rem;
+      letter-spacing: .05em;
+    }
+
+    .service-item h3 {
+      font-family: var(--font-body);
+      font-size: .95rem;
+      font-weight: 500;
+      letter-spacing: .01em;
+      margin-bottom: .5rem;
+    }
+
+    .service-item p {
+      font-size: .88rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* ─── Contact ─── */
+    .contact {
+      padding: 8vh 0 12vh;
+      opacity: 0;
+      animation: slideUp .9s ease 1s forwards;
+    }
+
+    .contact-inner {
+      background: var(--bg-elevated);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 3rem;
+    }
+
+    .contact-inner p {
+      color: var(--text-dim);
+      font-size: .92rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-email {
+      font-family: var(--font-mono);
+      font-size: .95rem;
+      font-weight: 300;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem 0;
+      border-bottom: 1px solid var(--accent-dim);
+      transition: border-color .3s;
+    }
+
+    .contact-email:hover {
+      border-color: var(--accent);
+    }
+
+    .contact-email svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 2rem 0 3rem;
+      opacity: 0;
+      animation: fadeIn .6s ease 1.2s forwards;
+    }
+
+    footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--rule);
+      padding-top: 2rem;
+    }
+
+    footer p {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: .05em;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px) }
+      to { opacity: 1; transform: translateY(0) }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .wrap { padding: 0 1.25rem }
+      .hero { padding: 8vh 0 6vh }
+      .services { padding: 6vh 0 }
+      .contact { padding: 6vh 0 8vh }
+      .contact-inner { padding: 2rem 1.5rem }
+      footer .wrap { flex-direction: column; gap: .75rem; text-align: center }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <nav>
+      <div class="wrap">
+        <a href="/" class="logo">tira<span>tap</span></a>
+        <a href="#contact" class="contact-link">Contact</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-label">Web services &amp; engineering</div>
+        <h1>We build the tools that structure your data.</h1>
+        <p>Tiratap develops custom solutions for complex data management. Admin interfaces, AI-powered dashboards, control systems — we build what your business needs. Original founder of <a href="https://ahotu.com" target="_blank" rel="noopener">ahotu.com</a>.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <section class="services">
+      <div class="wrap">
+        <div class="section-label">What we do</div>
+        <div class="services-grid">
+          <div class="service-item">
+            <span class="service-num">01</span>
+            <div>
+              <h3>Custom management tools</h3>
+              <p>Back-offices, custom CMS and admin interfaces tailored to the complexity of your business data.</p>
+            </div>
+          </div>
+          <div class="service-item">
+            <span class="service-num">02</span>
+            <div>
+              <h3>Dashboards &amp; visualization</h3>
+              <p>Interactive dashboards enhanced with AI insights to monitor your activity, cross-reference your metrics and make smarter decisions.</p>
+            </div>
+          </div>
+          <div class="service-item">
+            <span class="service-num">03</span>
+            <div>
+              <h3>Integration &amp; architecture</h3>
+              <p>Connecting your existing systems, APIs, databases and AI services into a coherent, future-ready architecture.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="section-label">Let's talk about your project</div>
+        <div class="contact-inner">
+          <p>Have a data management need or a project to structure? Get in touch.</p>
+          <a href="mailto:contact@tiratap.com" class="contact-email">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            contact@tiratap.com
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>&copy; 2026 Tiratap</p>
+        <p>Data engineering for the web</p>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>
